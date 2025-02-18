@@ -8,16 +8,6 @@ from datetime import datetime, timedelta
 # Configuração da página
 st.set_page_config(page_title="Monitoramento - Estação de Petróleo", layout="wide", initial_sidebar_state="expanded")
 
-# Sidebar para navegação
-st.sidebar.title("🛢️ Navegação")
-pagina = st.sidebar.radio("", [
-    "Overview",
-    "Monitoramento de Bombas",
-    "Pressão e Temperatura",
-    "Manutenção Preditiva",
-    "Alarmes"
-])
-
 # Dados simulados
 def gerar_dados_sensor():
     now = datetime.now()
@@ -30,109 +20,141 @@ def gerar_dados_sensor():
         'vibracao': np.random.normal(2.5, 0.5, 24)
     }
 
+# Gerando dados
 dados = pd.DataFrame(gerar_dados_sensor())
+
+# Sidebar para navegação
+st.sidebar.title("🛢️ Navegação")
+pagina = st.sidebar.radio("", [
+    "Overview",
+    "Monitoramento de Bombas",
+    "Pressão e Temperatura",
+    "Manutenção Preditiva",
+    "Alarmes"
+])
 
 # Página Overview
 if pagina == "Overview":
     st.title("🏭 Overview da Estação")
     
-    # Status geral
+    # Status geral - KPIs principais
+    st.markdown("""
+    <style>
+    .kpi-box {
+        background-color: #1E1E1E;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px;
+        text-align: center;
+    }
+    .equipment-box {
+        background-color: #2E2E2E;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px;
+        text-align: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Status Geral", "Normal", "↑ Operacional")
+        st.markdown("""
+        <div class="kpi-box">
+            <h3>Status Geral</h3>
+            <h2 style="color: #00FF00;">NORMAL</h2>
+            <p>↑ Operacional</p>
+        </div>
+        """, unsafe_allow_html=True)
     with col2:
-        st.metric("Produção Diária", "1500 bbl", "↑ 2%")
+        st.markdown("""
+        <div class="kpi-box">
+            <h3>Produção Diária</h3>
+            <h2>1500 bbl</h2>
+            <p>↑ 2%</p>
+        </div>
+        """, unsafe_allow_html=True)
     with col3:
-        st.metric("Pressão Média", f"{dados['pressao'].mean():.1f} PSI")
+        st.markdown(f"""
+        <div class="kpi-box">
+            <h3>Pressão Média</h3>
+            <h2>{dados['pressao'].mean():.1f} PSI</h2>
+            <p>↔ Estável</p>
+        </div>
+        """, unsafe_allow_html=True)
     with col4:
-        st.metric("Temperatura Média", f"{dados['temperatura'].mean():.1f}°C")
+        st.markdown(f"""
+        <div class="kpi-box">
+            <h3>Temperatura Média</h3>
+            <h2>{dados['temperatura'].mean():.1f}°C</h2>
+            <p>↑ Normal</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Layout de equipamentos
-    st.subheader("Layout da Estação")
-    col1, col2 = st.columns([2,1])
+    # Equipamentos com GIFs/imagens
+    st.subheader("Monitoramento de Equipamentos")
+    
+    col1, col2, col3 = st.columns(3)
+    
     with col1:
-        # Aqui você pode adicionar uma imagem do layout da estação
-        st.image("https://via.placeholder.com/800x400?text=Layout+da+Estacao")
-    with col2:
-        st.write("### Status dos Equipamentos")
-        st.write("🟢 Bomba Principal: Operacional")
-        st.write("🟢 Separador: Operacional")
-        st.write("🟡 Compressor: Atenção")
-        st.write("🟢 Válvulas: Operacional")
+        st.markdown("""
+        <div class="equipment-box">
+            <h4>Compressor Principal</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        # GIF de um compressor industrial
+        st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDd5Y2k4Y2JyOWF1OWF4bWh6bHp6YnB0YmRxNHBnOWF1dmpxbG92cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KfYPg04GkiOre/giphy.gif", 
+                 caption="Status: 🟢 Operacional")
+        st.markdown("""
+        - Pressão: 120 PSI
+        - Temperatura: 75°C
+        - Vibração: Normal
+        """)
 
-# Página Monitoramento de Bombas
-elif pagina == "Monitoramento de Bombas":
-    st.title("⚙️ Monitoramento de Bombas")
-    
-    # Seletor de equipamento
-    equipamento = st.selectbox("Selecione o equipamento", 
-                             ["Bomba Principal", "Bomba Secundária", "Bomba de Injeção"])
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        # Gráfico de vibração
-        fig_vib = px.line(dados, x='timestamp', y='vibracao',
-                         title="Nível de Vibração")
-        st.plotly_chart(fig_vib, use_container_width=True)
-    
     with col2:
-        # Gráfico de vazão
-        fig_vazao = px.line(dados, x='timestamp', y='vazao',
-                           title="Vazão")
-        st.plotly_chart(fig_vazao, use_container_width=True)
+        st.markdown("""
+        <div class="equipment-box">
+            <h4>Bomba de Injeção</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        # GIF/imagem de uma bomba industrial
+        st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmZ5ZWZ0Y2wzNXB6ZHZ0ZDdwbXN2NnB5aHBnM2t5Ym8yeHdqYjNwaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7btQ8jDTPGDpgc6I/giphy.gif", 
+                 caption="Status: 🟡 Atenção")
+        st.markdown("""
+        - Vazão: 500 m³/h
+        - Pressão: 85 PSI
+        - Vibração: Elevada
+        """)
 
-# Página Pressão e Temperatura
-elif pagina == "Pressão e Temperatura":
-    st.title("🌡️ Pressão e Temperatura")
-    
-    # Gráficos de pressão e temperatura
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=dados['timestamp'], y=dados['pressao'],
-                            name="Pressão (PSI)"))
-    fig.add_trace(go.Scatter(x=dados['timestamp'], y=dados['temperatura'],
-                            name="Temperatura (°C)", yaxis="y2"))
-    
-    fig.update_layout(
-        title="Monitoramento de Pressão e Temperatura",
-        yaxis=dict(title="Pressão (PSI)"),
-        yaxis2=dict(title="Temperatura (°C)", overlaying="y", side="right")
+    with col3:
+        st.markdown("""
+        <div class="equipment-box">
+            <h4>Separador Trifásico</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        # Imagem de um separador
+        st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWhyY3RqMzF1NWd6ZWY2ZWR0M2wxbDY5Y2Zwd2J0cDdnNzBxdWp6ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7btQ8jDTPGDpgc6I/giphy.gif", 
+                 caption="Status: 🟢 Operacional")
+        st.markdown("""
+        - Nível: 65%
+        - Temperatura: 65°C
+        - Pressão: 45 PSI
+        """)
+
+    # Gráfico de tendência em tempo real
+    st.subheader("Tendência em Tempo Real")
+    chart_data = pd.DataFrame(
+        np.random.randn(20, 3),
+        columns=['Pressão', 'Temperatura', 'Vazão']
     )
-    
-    st.plotly_chart(fig, use_container_width=True)
+    st.line_chart(chart_data)
 
-# Página Manutenção Preditiva
-elif pagina == "Manutenção Preditiva":
-    st.title("🔧 Manutenção Preditiva")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Próximas Manutenções")
-        st.write("🔸 Bomba Principal: 15 dias")
-        st.write("🔸 Separador: 30 dias")
-        st.write("🔸 Compressor: 2 dias")
-        
-    with col2:
-        st.subheader("Histórico de Falhas")
-        # Gráfico de pizza para tipos de falhas
-        dados_falhas = pd.DataFrame({
-            'Tipo': ['Mecânica', 'Elétrica', 'Instrumentação', 'Outros'],
-            'Quantidade': [15, 8, 12, 5]
-        })
-        fig = px.pie(dados_falhas, values='Quantidade', names='Tipo',
-                    title="Distribuição de Falhas")
-        st.plotly_chart(fig, use_container_width=True)
-
-# Página Alarmes
-elif pagina == "Alarmes":
-    st.title("⚠️ Alarmes")
-    
-    # Tabela de alarmes
-    alarmes = pd.DataFrame({
-        'Timestamp': pd.date_range(start='2024-02-18', periods=5, freq='H'),
-        'Equipamento': ['Compressor', 'Bomba Principal', 'Separador', 'Válvula', 'Bomba Secundária'],
-        'Tipo': ['Alta Temperatura', 'Vibração', 'Nível Alto', 'Posição', 'Pressão'],
-        'Severidade': ['Alta', 'Média', 'Baixa', 'Baixa', 'Média'],
-        'Status': ['Ativo', 'Resolvido', 'Ativo', 'Em análise', 'Resolvido']
-    })
-    
-    st.dataframe(alarmes, use_container_width=True)
+    # Alertas e Notificações
+    st.subheader("Alertas Recentes")
+    alertas = [
+        "⚠️ Vibração elevada na Bomba de Injeção - Há 5 min",
+        "✅ Manutenção preventiva do Compressor concluída - Há 1h",
+        "ℹ️ Troca de filtros programada para amanhã"
+    ]
+    for alerta in alertas:
+        st.info(alerta)
